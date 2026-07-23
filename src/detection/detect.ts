@@ -3,7 +3,7 @@ import type { ScamEntry } from '@sentinel/store'
 import { classify, hashImage, type Match } from './phash'
 import { gridFromBytes, shiftedGrids, type TileGrid, tileMatch } from './tiles'
 
-async function download(url: string): Promise<Buffer> {
+export async function download(url: string): Promise<Buffer> {
   const res = await fetch(url)
   if (!res.ok) throw new Error(`download failed: ${res.status}`)
   return Buffer.from(await res.arrayBuffer())

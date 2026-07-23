@@ -1,6 +1,12 @@
-import type { Attachment, Message, OmitPartialGroupDMChannel, SendableChannels } from 'discord.js'
+import {
+  type Attachment,
+  AttachmentBuilder,
+  type Message,
+  type OmitPartialGroupDMChannel,
+  type SendableChannels
+} from 'discord.js'
 
-import { classifyUrl } from '@sentinel/detection/detect'
+import { classifyImage, download } from '@sentinel/detection/detect'
 import type { Match } from '@sentinel/detection/phash'
 import { reportButtons, scamReportEmbed } from '@sentinel/embeds'
 import { type GuildSettings, getSettings, scamEntries } from '@sentinel/store'
@@ -34,15 +40,17 @@ export default async (message: OmitPartialGroupDMChannel<Message>) => {
     return
 
   for (const image of images) {
+    let bytes: Buffer
     let match: Match | null
     try {
-      match = await classifyUrl(image.url, entries, settings.threshold)
+      bytes = await download(image.url)
+      match = await classifyImage(bytes, entries, settings.threshold)
     } catch (error) {
       console.error('failed to hash attachment', error)
       continue
     }
     if (match) {
-      await act(message, image, match, settings)
+      await act(message, image, bytes, match, settings)
       return
     }
   }
@@ -51,10 +59,14 @@ export default async (message: OmitPartialGroupDMChannel<Message>) => {
 async function act(
   message: OmitPartialGroupDMChannel<Message<true>>,
   image: Attachment,
+  bytes: Buffer,
   match: Match,
   settings: GuildSettings
 ) {
   const author = message.author
+  const name = `scam${image.name.match(/\.\w+$/)?.[0] ?? '.png'}`
+  const file = new AttachmentBuilder(bytes, { name })
+  const url = `attachment://${name}`
 
   // review-tier tile matches are lower confidence: report for a human, but don't
   // delete the message or ban the author.
@@ -62,8 +74,9 @@ async function act(
     const target = await resolveReportChannel(message, settings)
     await target
       ?.send({
-        embeds: [scamReportEmbed(author, match, image.url, false)],
-        components: [reportButtons(author.id, false)]
+        embeds: [scamReportEmbed(author, match, url, false)],
+        components: [reportButtons(author.id, false)],
+        files: [file]
       })
       .catch(() => {})
     return
@@ -85,8 +98,9 @@ async function act(
   const target = await resolveReportChannel(message, settings)
   await target
     ?.send({
-      embeds: [scamReportEmbed(author, match, image.url, banned)],
-      components: [reportButtons(author.id, banned)]
+      embeds: [scamReportEmbed(author, match, url, banned)],
+      components: [reportButtons(author.id, banned)],
+      files: [file]
     })
     .catch(() => {})
 }

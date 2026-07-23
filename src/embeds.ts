@@ -51,7 +51,7 @@ export function scamReportEmbed(
       score,
       { name: 'Action', value: action, inline: false }
     )
-    .setThumbnail(imageUrl)
+    .setImage(imageUrl)
     .setTimestamp()
 }
 
