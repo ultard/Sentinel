@@ -11,7 +11,7 @@ import type { ScamEntry } from '@sentinel/store'
 const IMAGE_SIZE = 256
 const TILE_SIZE = 64
 const TILES_PER_SIDE = IMAGE_SIZE / TILE_SIZE // 4
-const TILE_COUNT = TILES_PER_SIDE * TILES_PER_SIDE // 16
+export const TILE_COUNT = TILES_PER_SIDE * TILES_PER_SIDE // 16
 const HASH_SIZE = 8 // 8x8 DCT coefficients -> 64-bit hash
 
 // a tile counts as "informative" (worth comparing) when its pixel variance clears

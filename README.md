@@ -43,9 +43,11 @@ Copy `.env.example` to `.env` and edit the values.
 
 `/scam check <image>` — test an image, report nearest match + distance
 
-`/scam config [channel] [threshold] [autoban]` — per-server settings (no args = show current)
+`/scam config [channel] [threshold] [autoban] [reset-channel]` — per-server settings (no args = show current)
 
 `/scam ignore-role <role> [remove]` — roles that are never scanned
+
+`/scam ignore-channel <channel> [remove]` — channels (and their threads) that are never scanned
 
 Right-click a message → **Apps → Add image to scam list** is the quick way to
 grow the dataset.

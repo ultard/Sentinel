@@ -20,6 +20,13 @@ export default async (message: OmitPartialGroupDMChannel<Message>) => {
   if (entries.length === 0) return
 
   const settings = getSettings(message.guildId)
+  // a thread inherits its parent channel's exemption
+  if (
+    settings.ignoreChannelIds.some(
+      (id) => id === message.channelId || id === message.channel.parentId
+    )
+  )
+    return
   if (
     settings.ignoreRoleIds.length &&
     message.member?.roles.cache.hasAny(...settings.ignoreRoleIds)
@@ -36,7 +43,7 @@ export default async (message: OmitPartialGroupDMChannel<Message>) => {
     }
     if (match) {
       await act(message, image, match, settings)
-      return // one report per message is enough
+      return
     }
   }
 }

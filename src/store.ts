@@ -22,6 +22,8 @@ export interface GuildSettings {
   autoban: boolean
   /** members with any of these roles are never scanned */
   ignoreRoleIds: string[]
+  /** messages in these channels (or their threads) are never scanned */
+  ignoreChannelIds: string[]
 }
 
 const DATASET_FILE = path.join(DATA_DIR, 'dataset.json')
@@ -100,6 +102,7 @@ export function getSettings(guildId: string): GuildSettings {
     threshold: DEFAULT_THRESHOLD,
     autoban: false,
     ignoreRoleIds: [],
+    ignoreChannelIds: [],
     ...settings[guildId]
   }
 }

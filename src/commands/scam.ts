@@ -53,12 +53,22 @@ export const data = new SlashCommandBuilder()
       .addBooleanOption((o) =>
         o.setName('autoban').setDescription('Ban the author automatically on a match')
       )
+      .addBooleanOption((o) =>
+        o.setName('reset-channel').setDescription('Report in the origin channel again')
+      )
   )
   .addSubcommand((s) =>
     s
       .setName('ignore-role')
       .setDescription('Add or remove a role that is never scanned')
       .addRoleOption((o) => o.setName('role').setDescription('The role').setRequired(true))
+      .addBooleanOption((o) => o.setName('remove').setDescription('Remove instead of add'))
+  )
+  .addSubcommand((s) =>
+    s
+      .setName('ignore-channel')
+      .setDescription('Add or remove a channel that is never scanned')
+      .addChannelOption((o) => o.setName('channel').setDescription('The channel').setRequired(true))
       .addBooleanOption((o) => o.setName('remove').setDescription('Remove instead of add'))
   )
 
@@ -86,6 +96,8 @@ export async function execute(interaction: ChatInputCommandInteraction) {
       return config(interaction)
     case 'ignore-role':
       return ignoreRole(interaction)
+    case 'ignore-channel':
+      return ignoreChannel(interaction)
   }
 }
 
@@ -177,8 +189,9 @@ async function config(interaction: GuildChatInput) {
   const channel = interaction.options.getChannel('channel')
   const threshold = interaction.options.getInteger('threshold')
   const autoban = interaction.options.getBoolean('autoban')
+  const resetChannel = interaction.options.getBoolean('reset-channel')
 
-  if (channel === null && threshold === null && autoban === null) {
+  if (channel === null && threshold === null && autoban === null && !resetChannel) {
     const s = getSettings(interaction.guildId)
     await interaction.reply({
       embeds: [
@@ -188,7 +201,8 @@ async function config(interaction: GuildChatInput) {
             `Report channel: ${s.notifyChannelId ? `<#${s.notifyChannelId}>` : 'origin channel'}`,
             `Threshold: ${s.threshold}/64`,
             `Autoban: ${s.autoban}`,
-            `Ignored roles: ${s.ignoreRoleIds.map((r) => `<@&${r}>`).join(', ') || 'none'}`
+            `Ignored roles: ${s.ignoreRoleIds.map((r) => `<@&${r}>`).join(', ') || 'none'}`,
+            `Ignored channels: ${s.ignoreChannelIds.map((c) => `<#${c}>`).join(', ') || 'none'}`
           ].join('\n')
         )
       ],
@@ -198,7 +212,9 @@ async function config(interaction: GuildChatInput) {
   }
 
   updateSettings(interaction.guildId, {
-    ...(channel !== null && { notifyChannelId: channel.id }),
+    ...(resetChannel
+      ? { notifyChannelId: undefined }
+      : channel !== null && { notifyChannelId: channel.id }),
     ...(threshold !== null && { threshold }),
     ...(autoban !== null && { autoban })
   })
@@ -220,6 +236,26 @@ async function ignoreRole(interaction: GuildChatInput) {
     embeds: [
       successEmbed(
         `${remove ? 'Removed' : 'Added'} <@&${role.id}> ${remove ? 'from' : 'to'} the ignore list.`
+      )
+    ],
+    flags: MessageFlags.Ephemeral
+  })
+}
+
+async function ignoreChannel(interaction: GuildChatInput) {
+  const channel = interaction.options.getChannel('channel', true)
+  const remove = interaction.options.getBoolean('remove') ?? false
+  const current = getSettings(interaction.guildId).ignoreChannelIds
+
+  const next = remove
+    ? current.filter((id) => id !== channel.id)
+    : [...new Set([...current, channel.id])]
+  updateSettings(interaction.guildId, { ignoreChannelIds: next })
+
+  await interaction.reply({
+    embeds: [
+      successEmbed(
+        `${remove ? 'Removed' : 'Added'} <#${channel.id}> ${remove ? 'from' : 'to'} the ignore list.`
       )
     ],
     flags: MessageFlags.Ephemeral
