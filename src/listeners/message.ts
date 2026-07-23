@@ -1,7 +1,8 @@
 import type { Attachment, Message, OmitPartialGroupDMChannel, SendableChannels } from 'discord.js'
 
+import { classifyUrl } from '@sentinel/detect'
 import { reportButtons, scamReportEmbed } from '@sentinel/embeds'
-import { classify, hashUrl, type Match } from '@sentinel/phash'
+import type { Match } from '@sentinel/phash'
 import { type GuildSettings, getSettings, scamEntries } from '@sentinel/store'
 
 // real scam screenshots are tiny; skip anything larger
@@ -28,7 +29,7 @@ export default async (message: OmitPartialGroupDMChannel<Message>) => {
   for (const image of images) {
     let match: Match | null
     try {
-      match = classify(await hashUrl(image.url), entries, settings.threshold)
+      match = await classifyUrl(image.url, entries, settings.threshold)
     } catch (error) {
       console.error('failed to hash attachment', error)
       continue
@@ -47,6 +48,20 @@ async function act(
   settings: GuildSettings
 ) {
   const author = message.author
+
+  // review-tier tile matches are lower confidence: report for a human, but don't
+  // delete the message or ban the author.
+  if (!match.confident) {
+    const target = await resolveReportChannel(message, settings)
+    await target
+      ?.send({
+        embeds: [scamReportEmbed(author, match, image.url, false)],
+        components: [reportButtons(author.id, false)]
+      })
+      .catch(() => {})
+    return
+  }
+
   await message.delete().catch(() => {})
 
   let banned = false

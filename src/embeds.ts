@@ -27,14 +27,29 @@ export function scamReportEmbed(
   imageUrl: string,
   banned: boolean
 ): EmbedBuilder {
+  const review = !match.confident
+  const score =
+    match.reason === 'tiles' && match.tiles
+      ? {
+          name: 'Tiles matched',
+          value: `${match.tiles.matched}/${match.tiles.informative}`,
+          inline: true
+        }
+      : { name: 'Distance', value: `${match.distance}/64`, inline: true }
+  const action = review
+    ? '⚠️ Flagged for review (message kept)'
+    : banned
+      ? '🔨 Auto-banned'
+      : '🗑️ Message deleted'
+
   return new EmbedBuilder()
-    .setTitle('🚨 Scam image detected')
-    .setColor(banned ? Colors.DarkRed : Colors.Orange)
+    .setTitle(review ? '⚠️ Possible scam image' : '🚨 Scam image detected')
+    .setColor(review ? Colors.Yellow : banned ? Colors.DarkRed : Colors.Orange)
     .addFields(
       { name: 'User', value: `${author} (${author.tag})`, inline: true },
       { name: 'Matched', value: `\`${match.entry.name}\``, inline: true },
-      { name: 'Distance', value: `${match.distance}/64`, inline: true },
-      { name: 'Action', value: banned ? '🔨 Auto-banned' : '🗑️ Message deleted', inline: false }
+      score,
+      { name: 'Action', value: action, inline: false }
     )
     .setThumbnail(imageUrl)
     .setTimestamp()

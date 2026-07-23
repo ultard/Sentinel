@@ -11,10 +11,7 @@ import { errorEmbed } from '@sentinel/embeds'
 export default async (interaction: Interaction) => {
   if (!interaction.inGuild()) return
   if (interaction.isButton()) return handleButton(interaction)
-  if (
-    interaction.isChatInputCommand() || 
-    interaction.isMessageContextMenuCommand()
-  )
+  if (interaction.isChatInputCommand() || interaction.isMessageContextMenuCommand())
     return handleCommand(interaction)
 }
 

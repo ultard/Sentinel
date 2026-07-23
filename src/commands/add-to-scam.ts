@@ -6,8 +6,9 @@ import {
   PermissionFlagsBits
 } from 'discord.js'
 
+import { entryHashes } from '@sentinel/detect'
 import { errorEmbed, infoEmbed, successEmbed } from '@sentinel/embeds'
-import { classify, hashUrl } from '@sentinel/phash'
+import { classify } from '@sentinel/phash'
 import { addScam, scamEntries } from '@sentinel/store'
 
 export const data = new ContextMenuCommandBuilder()
@@ -28,7 +29,7 @@ export async function execute(interaction: MessageContextMenuCommandInteraction)
   }
 
   await interaction.deferReply({ flags: MessageFlags.Ephemeral })
-  const hash = await hashUrl(image.url)
+  const { hash, grid } = await entryHashes(image.url)
 
   const existing = classify(hash, scamEntries(), 6)
   if (existing) {
@@ -39,6 +40,6 @@ export async function execute(interaction: MessageContextMenuCommandInteraction)
   }
 
   const name = `manual_${Date.now().toString(36)}`
-  addScam({ name, hash, addedBy: interaction.user.id, addedAt: new Date().toISOString() })
+  addScam({ name, hash, grid, addedBy: interaction.user.id, addedAt: new Date().toISOString() })
   await interaction.editReply({ embeds: [successEmbed(`Added \`${name}\` to the scam dataset.`)] })
 }

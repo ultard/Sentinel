@@ -2,11 +2,14 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { DATA_DIR, DEFAULT_THRESHOLD } from '@sentinel/config'
+import type { TileGrid } from '@sentinel/tiles'
 
 export interface ScamEntry {
   name: string
-  /** 64-char binary perceptual hash */
+  /** 64-char binary perceptual hash (whole image) */
   hash: string
+  /** shift-aligned tile grid; absent on seeded defaults (whole-image match only) */
+  grid?: TileGrid
   addedBy: string
   addedAt: string
 }
@@ -32,7 +35,6 @@ function readJson<T>(file: string, fallback: T): T {
   }
 }
 
-
 function writeJson(file: string, data: unknown): void {
   fs.mkdirSync(path.dirname(file), { recursive: true })
   const tmp = `${file}.tmp`
@@ -45,6 +47,35 @@ const settings: Record<string, GuildSettings> = readJson(SETTINGS_FILE, {})
 
 export function scamEntries(): readonly ScamEntry[] {
   return dataset
+}
+
+const SEED_URL =
+  process.env.SEED_URL ??
+  'https://raw.githubusercontent.com/ultard/Sentinel/main/data/defaults.json'
+
+export async function seedFromGithub(): Promise<void> {
+  if (process.env.SEED_DISABLED === 'true') return
+
+  let remote: ScamEntry[]
+  try {
+    const res = await fetch(SEED_URL)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    remote = (await res.json()) as ScamEntry[]
+  } catch (err) {
+    console.warn(`[seed] could not load default hashes: ${String(err)}`)
+    return
+  }
+
+  const known = new Set(dataset.flatMap((e) => [e.name, e.hash]))
+  let added = 0
+  for (const e of remote) {
+    if (known.has(e.name) || known.has(e.hash)) continue
+    dataset.push(e)
+    known.add(e.name).add(e.hash)
+    added++
+  }
+  if (added) writeJson(DATASET_FILE, dataset)
+  console.log(`[seed] loaded ${added} default hash(es) from GitHub`)
 }
 
 /** false if an entry with that name already exists */

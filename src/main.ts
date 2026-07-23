@@ -52,10 +52,7 @@ async function main() {
   const body = client.commands.map((command) => command.data.toJSON())
   const rest = new REST({ version: '10' }).setToken(token)
 
-  await rest.put(
-    Routes.applicationGuildCommands(applicationId, guildId), 
-    { body }
-  )
+  await rest.put(Routes.applicationGuildCommands(applicationId, guildId), { body })
 
   client.once('clientReady', ReadyListener)
   client.on('messageCreate', MessageListener)

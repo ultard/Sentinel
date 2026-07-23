@@ -5,6 +5,7 @@ import {
   SlashCommandBuilder
 } from 'discord.js'
 
+import { entryHashes } from '@sentinel/detect'
 import { errorEmbed, infoEmbed, successEmbed } from '@sentinel/embeds'
 import { classify, hashUrl, nearest } from '@sentinel/phash'
 import { addScam, getSettings, removeScam, scamEntries, updateSettings } from '@sentinel/store'
@@ -99,7 +100,7 @@ async function add(interaction: ChatInputCommandInteraction) {
   }
 
   await interaction.deferReply({ flags: MessageFlags.Ephemeral })
-  const hash = await hashUrl(image.url)
+  const { hash, grid } = await entryHashes(image.url)
 
   const existing = classify(hash, scamEntries(), 6)
   if (existing) {
@@ -113,6 +114,7 @@ async function add(interaction: ChatInputCommandInteraction) {
   const ok = addScam({
     name,
     hash,
+    grid,
     addedBy: interaction.user.id,
     addedAt: new Date().toISOString()
   })
@@ -159,12 +161,13 @@ async function check(interaction: GuildChatInput) {
   }
 
   const threshold = getSettings(interaction.guildId).threshold
-  const flagged = match.distance <= threshold
+  const distance = match.distance ?? 64
+  const flagged = distance <= threshold
   await interaction.editReply({
     embeds: [
       infoEmbed(
         flagged ? '🚨 Would be flagged' : '✅ Clean',
-        `Nearest: \`${match.entry.name}\` at distance **${match.distance}/64** (threshold ${threshold}).`
+        `Nearest: \`${match.entry.name}\` at distance **${distance}/64** (threshold ${threshold}).`
       )
     ]
   })

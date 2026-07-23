@@ -1,8 +1,9 @@
 # dependencies (bun install)
 node_modules
 
-# runtime data (scam dataset + guild settings)
+# runtime data
 data
+!data/defaults.json
 
 # output
 out
