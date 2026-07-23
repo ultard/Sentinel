@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "start": "bun run src/main.ts",
+    "promote": "bun run src/promote-defaults.ts",
     "lint": "biome check .",
     "format": "biome check --write ."
   },
