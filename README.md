@@ -24,10 +24,15 @@ it empty to register globally. Set `OWNER_ID` to restrict dataset edits to you.
 ## Commands
 
 `/scam add <image> [name]` — add a scam image to the dataset
+
 `/scam remove <name>` — remove an entry
+
 `/scam list` — list entries
+
 `/scam check <image>` — test an image, report nearest match + distance
+
 `/scam config [channel] [threshold] [autoban]` — per-server settings (no args = show current)
+
 `/scam ignore-role <role> [remove]` — roles that are never scanned
 
 Right-click a message → **Apps → Add image to scam list** is the quick way to
