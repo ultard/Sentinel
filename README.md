@@ -3,7 +3,8 @@
 Discord anti-scam bot. Catches known scam screenshots (fake giveaways, casino
 spam) even after they're re-encoded/resized, using a **perceptual hash** (DCT
 pHash) instead of a byte hash — the same concept as
-[anti-scam](./anti-scam), rebuilt small in TypeScript/Bun.
+[Amirust/anti-scam](https://github.com/Amirust/anti-scam), rebuilt small in
+TypeScript/Bun.
 
 On a match it deletes the message and posts a report (with a **Ban** button)
 to the configured channel; optionally auto-bans.
