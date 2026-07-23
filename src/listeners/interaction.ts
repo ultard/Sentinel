@@ -17,7 +17,6 @@ export default async (interaction: Interaction) => {
 
 async function handleCommand(interaction: CommandInteraction) {
   const command = interaction.client.commands.get(interaction.commandName)
-  console.log(command)
   if (!command) {
     console.error(`No command matching ${interaction.commandName} was found.`)
     return
