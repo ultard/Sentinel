@@ -26,7 +26,7 @@ export async function classifyUrl(
   return classifyImage(await download(url), entries, threshold)
 }
 
-export async function entryHashes(url: string): Promise<{ hash: string; grid: TileGrid }> {
-  const bytes = await download(url)
+export async function entryHashes(src: string | Buffer): Promise<{ hash: string; grid: TileGrid }> {
+  const bytes = typeof src === 'string' ? await download(src) : src
   return { hash: await hashImage(bytes), grid: await gridFromBytes(bytes) }
 }

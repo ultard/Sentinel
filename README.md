@@ -52,6 +52,14 @@ Copy `.env.example` to `.env` and edit the values.
 Right-click a message → **Apps → Add image to scam list** is the quick way to
 grow the dataset.
 
+## Drop folder
+
+Copy images into `data/inbox/` (created on startup) and the bot hashes each
+one, logging whether that hash is already in the dataset and adding it if not
+(entry name = file name without extension). The folder is scanned at startup
+and watched live; files are left in place, so re-scans just report
+"already in dataset".
+
 ## How it works
 
 Detection runs in two stages (a port of the Rust original's pipeline):
