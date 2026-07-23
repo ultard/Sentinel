@@ -1,7 +1,8 @@
 import sharp from 'sharp'
 
-import { type Match, packHash, popcount32 } from '@sentinel/phash'
 import type { ScamEntry } from '@sentinel/store'
+
+import { type Match, packHash, popcount32 } from './phash'
 
 // port of anti-scam's shift-aligned tile matcher: split the normalized image into
 // a 4x4 grid, hash each tile, and compare against a DB entry's grid under every
@@ -206,7 +207,9 @@ function bestShift(shifted: PackedGrid[], db: PackedGrid): TileScore {
     for (let i = 0; i < TILE_COUNT; i++) {
       if (!grid.informative[i] || !db.informative[i]) continue
       const j = i * 2
-      const d = popcount32(grid.words[j]! ^ db.words[j]!) + popcount32(grid.words[j + 1]! ^ db.words[j + 1]!)
+      const d =
+        popcount32(grid.words[j]! ^ db.words[j]!) +
+        popcount32(grid.words[j + 1]! ^ db.words[j + 1]!)
       informative++
       total += d
       if (d <= TILE_MATCH_THRESHOLD) matched++

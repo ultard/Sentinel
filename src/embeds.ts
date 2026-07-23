@@ -8,7 +8,7 @@ import {
   type User
 } from 'discord.js'
 
-import type { Match } from '@sentinel/phash'
+import type { Match } from '@sentinel/detection/phash'
 
 export function infoEmbed(
   title: string,

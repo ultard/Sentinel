@@ -2,8 +2,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { DATA_DIR } from '@sentinel/config'
-import { entryHashes } from '@sentinel/detect'
-import { classify } from '@sentinel/phash'
+import { entryHashes } from '@sentinel/detection/detect'
+import { classify } from '@sentinel/detection/phash'
 import { addScam, scamEntries } from '@sentinel/store'
 
 const INBOX_DIR = path.join(DATA_DIR, 'inbox')

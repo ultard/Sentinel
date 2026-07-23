@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 
-import { classify, hamming, nearest } from '@sentinel/phash'
+import { classify, hamming, nearest } from '@sentinel/detection/phash'
 import type { ScamEntry } from '@sentinel/store'
 
 const entry = (name: string, hash: string): ScamEntry => ({

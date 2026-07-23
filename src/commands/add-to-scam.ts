@@ -6,9 +6,9 @@ import {
   PermissionFlagsBits
 } from 'discord.js'
 
-import { entryHashes } from '@sentinel/detect'
+import { entryHashes } from '@sentinel/detection/detect'
+import { classify } from '@sentinel/detection/phash'
 import { errorEmbed, infoEmbed, successEmbed } from '@sentinel/embeds'
-import { classify } from '@sentinel/phash'
 import { addScam, scamEntries } from '@sentinel/store'
 
 export const data = new ContextMenuCommandBuilder()

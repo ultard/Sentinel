@@ -1,8 +1,8 @@
 import type { Attachment, Message, OmitPartialGroupDMChannel, SendableChannels } from 'discord.js'
 
-import { classifyUrl } from '@sentinel/detect'
+import { classifyUrl } from '@sentinel/detection/detect'
+import type { Match } from '@sentinel/detection/phash'
 import { reportButtons, scamReportEmbed } from '@sentinel/embeds'
-import type { Match } from '@sentinel/phash'
 import { type GuildSettings, getSettings, scamEntries } from '@sentinel/store'
 
 // real scam screenshots are tiny; skip anything larger

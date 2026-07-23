@@ -5,9 +5,9 @@ import {
   SlashCommandBuilder
 } from 'discord.js'
 
-import { entryHashes } from '@sentinel/detect'
+import { entryHashes } from '@sentinel/detection/detect'
+import { classify, hashUrl, nearest } from '@sentinel/detection/phash'
 import { errorEmbed, infoEmbed, successEmbed } from '@sentinel/embeds'
-import { classify, hashUrl, nearest } from '@sentinel/phash'
 import { addScam, getSettings, removeScam, scamEntries, updateSettings } from '@sentinel/store'
 
 export const data = new SlashCommandBuilder()

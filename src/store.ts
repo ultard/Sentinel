@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { DATA_DIR, DEFAULT_THRESHOLD } from '@sentinel/config'
-import type { TileGrid } from '@sentinel/tiles'
+import type { TileGrid } from '@sentinel/detection/tiles'
 
 export interface ScamEntry {
   name: string

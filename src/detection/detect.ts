@@ -1,6 +1,7 @@
-import { classify, hashImage, type Match } from '@sentinel/phash'
 import type { ScamEntry } from '@sentinel/store'
-import { gridFromBytes, shiftedGrids, type TileGrid, tileMatch } from '@sentinel/tiles'
+
+import { classify, hashImage, type Match } from './phash'
+import { gridFromBytes, shiftedGrids, type TileGrid, tileMatch } from './tiles'
 
 async function download(url: string): Promise<Buffer> {
   const res = await fetch(url)

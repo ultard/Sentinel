@@ -1,7 +1,13 @@
 import { expect, test } from 'bun:test'
 
+import {
+  dctHash,
+  shiftPixels,
+  TILE_COUNT,
+  type TileGrid,
+  tileMatch
+} from '@sentinel/detection/tiles'
 import type { ScamEntry } from '@sentinel/store'
-import { dctHash, shiftPixels, TILE_COUNT, type TileGrid, tileMatch } from '@sentinel/tiles'
 
 const H0 = '0'.repeat(64)
 /** a hash `n` bits away from H0 (n<=13 counts as a tile match, else not) */
